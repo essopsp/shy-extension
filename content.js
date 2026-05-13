@@ -3,56 +3,36 @@
   let settings = defaults;
 
   const SIDEBAR_SELECTORS = [
+    'div.flex-shrink-0.overflow-x-hidden.bg-token-sidebar-surface-primary',
+    'div.flex-shrink-0.overflow-x-hidden',
     'nav',
-    'aside',
-    '[data-testid="sidebar"]',
-    '#sidebar',
-    '.sidebar',
-    '[class*="sidebar"]',
-    '[class*="w-\\["]'
+    'aside'
   ];
 
   function findSidebar() {
-    const allNavs = document.querySelectorAll('nav, aside');
-    for (const el of allNavs) {
-      const text = el.textContent || '';
-      const hasNewChat = text.includes('New chat') || text.includes('New');
-      const hasHistory = el.querySelector('[draggable="true"]') || el.querySelector('a[href*="/c/"]');
-      const hasWidth = el.className.includes('w-') || el.className.includes('width');
-      if ((hasNewChat || hasHistory) && hasWidth) {
-        return el;
-      }
-    }
-
-    for (const selector of SIDEBAR_SELECTORS) {
+    for (const sel of SIDEBAR_SELECTORS) {
       try {
-        const el = document.querySelector(selector);
-        if (el && (el.textContent?.includes('New chat') || el.querySelector('[draggable="true"]'))) {
-          return el;
-        }
+        const el = document.querySelector(sel);
+        if (el) return el;
       } catch (e) {}
     }
-
-    const allDivs = document.querySelectorAll('div');
-    for (const div of allDivs) {
-      const style = div.getAttribute('style') || '';
-      if (style.includes('260px') || style.includes('280px') || style.includes('width: 260')) {
+    const all = document.querySelectorAll('div');
+    for (const div of all) {
+      const cn = div.className;
+      if (typeof cn === 'string' && cn.includes('flex-shrink-0') && cn.includes('overflow-x-hidden')) {
         return div;
       }
     }
-
     return null;
   }
 
   function applyBlur() {
     const sidebar = findSidebar();
-    if (!sidebar) {
-      return;
-    }
-
+    if (!sidebar) return;
     sidebar.classList.add('shy-blur');
     sidebar.dataset.shyActive = 'true';
     sidebar.style.setProperty('--shy-blur-intensity', settings.intensity + 'px');
+    sidebar.dataset.shyHoverReveal = settings.hoverReveal ? 'true' : 'false';
   }
 
   function removeBlur() {
@@ -62,62 +42,50 @@
     });
   }
 
-  function updateSettings(newSettings) {
-    settings = { ...settings, ...newSettings };
-    if (settings.enabled) {
+  function tryInit() {
+    if (findSidebar()) {
       applyBlur();
-    } else {
-      removeBlur();
+      return true;
     }
+    return false;
+  }
+
+  function startObserver() {
+    const target = document.body || document.documentElement;
+    const observer = new MutationObserver(() => {
+      if (!document.querySelector('[data-shy-active="true"]') && findSidebar()) {
+        applyBlur();
+      }
+    });
+    observer.observe(target, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 30000);
   }
 
   function init() {
     chrome.storage.sync.get(['shySettings'], (result) => {
       settings = result.shySettings || defaults;
       if (settings.enabled) {
-        const tryApply = () => {
-          if (findSidebar()) {
-            applyBlur();
-            return true;
-          }
-          return false;
-        };
-
-        if (!tryApply()) {
+        if (!tryInit()) {
           let attempts = 0;
           const interval = setInterval(() => {
             attempts++;
-            if (tryApply() || attempts > 20) {
-              clearInterval(interval);
-            }
+            if (tryInit() || attempts > 20) clearInterval(interval);
           }, 500);
         }
+        startObserver();
       }
     });
   }
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'updateSettings') {
-      updateSettings(message.settings);
+      settings = { ...settings, ...message.settings };
+      if (settings.enabled) applyBlur();
+      else removeBlur();
     } else if (message.action === 'toggle') {
       settings.enabled = !settings.enabled;
-      if (settings.enabled) {
-        applyBlur();
-      } else {
-        removeBlur();
-      }
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 's' && e.altKey) {
-      e.preventDefault();
-      settings.enabled = !settings.enabled;
-      if (settings.enabled) {
-        applyBlur();
-      } else {
-        removeBlur();
-      }
+      if (settings.enabled) applyBlur();
+      else removeBlur();
     }
   });
 

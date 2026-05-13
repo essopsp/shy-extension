@@ -4,8 +4,8 @@
   transition: filter 0.2s ease !important;
 }
 
-.shy-blur:hover,
-.shy-blur:hover > * {
+.shy-blur[data-shy-hover-reveal="true"]:hover,
+.shy-blur[data-shy-hover-reveal="true"]:hover > * {
   filter: blur(0) !important;
 }
 
