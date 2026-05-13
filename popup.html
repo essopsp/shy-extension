@@ -10,37 +10,51 @@
     }
     body {
       width: 280px;
-      padding: 16px;
+      padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1a1a1a;
-      color: #fff;
+      background: #1e1e28;
+      color: #f0f0f0;
     }
-    h1 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
+    .header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .header img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
     .setting {
       margin-bottom: 16px;
     }
     label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 500;
       margin-bottom: 6px;
-      color: #aaa;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .toggle-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
+    .toggle-row label {
+      margin-bottom: 0;
+    }
     .toggle {
       position: relative;
-      width: 44px;
-      height: 24px;
+      width: 40px;
+      height: 22px;
     }
     .toggle input {
       opacity: 0;
@@ -54,31 +68,32 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #444;
+      background: #2d2d3c;
       transition: 0.2s;
-      border-radius: 24px;
+      border-radius: 22px;
     }
     .slider:before {
       position: absolute;
       content: "";
-      height: 18px;
-      width: 18px;
+      height: 16px;
+      width: 16px;
       left: 3px;
       bottom: 3px;
-      background-color: white;
+      background: #666;
       transition: 0.2s;
       border-radius: 50%;
     }
     input:checked + .slider {
-      background-color: #10a37f;
+      background: #6b5f8e;
     }
     input:checked + .slider:before {
-      transform: translateX(20px);
+      background: #f0f0f0;
+      transform: translateX(18px);
     }
     input[type="range"] {
       width: 100%;
       height: 4px;
-      background: #444;
+      background: #2d2d3c;
       border-radius: 2px;
       outline: none;
       -webkit-appearance: none;
@@ -87,63 +102,61 @@
       -webkit-appearance: none;
       width: 16px;
       height: 16px;
-      background: #10a37f;
+      background: #7b6f9e;
       border-radius: 50%;
       cursor: pointer;
     }
     .shortcut-input {
       width: 100%;
       padding: 8px 12px;
-      background: #2a2a2a;
-      border: 1px solid #444;
-      border-radius: 6px;
-      color: #888;
+      background: #2d2d3c;
+      border: 1px solid #3c3c4b;
+      border-radius: 8px;
+      color: #666;
       font-size: 13px;
       outline: none;
       cursor: not-allowed;
     }
     .shortcut-hint {
       font-size: 11px;
-      color: #666;
+      color: #555;
       margin-top: 4px;
     }
     .shortcut-hint a {
-      color: #10a37f;
+      color: #7b6f9e;
       text-decoration: none;
     }
     .shortcut-hint a:hover {
       text-decoration: underline;
     }
     .status {
-      font-size: 12px;
-      color: #666;
+      font-size: 11px;
+      font-weight: 500;
+      color: #555;
       margin-top: 16px;
       text-align: center;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
     .status.active {
-      color: #10a37f;
+      color: #7b6f9e;
     }
     hr {
       border: none;
-      border-top: 1px solid #333;
+      border-top: 1px solid #2d2d3c;
       margin: 16px 0;
     }
   </style>
 </head>
 <body>
-  <h1>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-      <line x1="9" y1="9" x2="9.01" y2="9"/>
-      <line x1="15" y1="9" x2="15.01" y2="9"/>
-    </svg>
-    shy
-  </h1>
+  <div class="header">
+    <img src="icons/icon48.png" alt="shy">
+    <h1>shy</h1>
+  </div>
 
   <div class="setting">
     <div class="toggle-row">
-      <label style="margin:0">Enable blur</label>
+      <label style="margin-bottom:0">Enable blur</label>
       <label class="toggle">
         <input type="checkbox" id="enableBlur">
         <span class="slider"></span>
@@ -166,7 +179,7 @@
 
   <div class="setting">
     <div class="toggle-row">
-      <label style="margin:0">Hover to reveal</label>
+      <label style="margin-bottom:0">Hover to reveal</label>
       <label class="toggle">
         <input type="checkbox" id="hoverReveal" checked>
         <span class="slider"></span>
