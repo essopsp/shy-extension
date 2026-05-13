@@ -1,6 +1,7 @@
 (function() {
   const defaults = { enabled: true, intensity: 8, hoverReveal: true };
   let settings = defaults;
+  let observer = null;
 
   function findSidebar() {
     const candidates = document.querySelectorAll('nav, aside, [role="navigation"]');
@@ -54,39 +55,37 @@
     });
   }
 
-  function tryInit() {
-    if (findSidebar()) {
-      applyBlur();
-      return true;
-    }
-    return false;
-  }
-
   function startObserver() {
-    const target = document.body || document.documentElement;
-    let observer = new MutationObserver(() => {
+    observer = new MutationObserver(() => {
       if (!document.querySelector('[data-shy-active="true"]') && findSidebar()) {
         applyBlur();
-        observer.disconnect();
       }
     });
-    observer.observe(target, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), 30000);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
   }
 
   function init() {
+    startObserver();
+
+    if (findSidebar()) {
+      applyBlur();
+    }
+
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (!document.querySelector('[data-shy-active="true"]') && findSidebar()) {
+        applyBlur();
+      }
+      if (document.querySelector('[data-shy-active="true"]') || attempts > 30) {
+        clearInterval(interval);
+      }
+    }, 100);
+
     chrome.storage.sync.get(['shySettings'], (result) => {
       settings = result.shySettings || defaults;
-      if (settings.enabled) {
-        if (!tryInit()) {
-          let attempts = 0;
-          const interval = setInterval(() => {
-            attempts++;
-            if (tryInit() || attempts > 20) clearInterval(interval);
-          }, 500);
-        }
-        startObserver();
-      }
+      if (!settings.enabled) removeBlur();
+      else if (!document.querySelector('[data-shy-active="true"]')) applyBlur();
     });
   }
 
