@@ -1,15 +1,16 @@
-.shy-blur {
-  filter: blur(var(--shy-blur-intensity, 8px));
-  transition: filter 0.2s ease;
-  user-select: none;
-  pointer-events: auto;
+.shy-blur,
+.shy-blur > * {
+  filter: blur(var(--shy-blur-intensity, 8px)) !important;
+  transition: filter 0.2s ease !important;
 }
 
-.shy-blur:hover {
-  filter: blur(0);
+.shy-blur:hover,
+.shy-blur:hover > * {
+  filter: blur(0) !important;
 }
 
+.shy-blur,
 .shy-blur * {
-  user-select: none;
-  pointer-events: auto;
+  user-select: none !important;
+  pointer-events: auto !important;
 }

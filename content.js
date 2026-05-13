@@ -2,24 +2,57 @@
   const defaults = { enabled: true, intensity: 8, shortcut: 'Alt+S', hoverReveal: true };
   let settings = defaults;
 
-  function applyBlur() {
-    let sidebar = document.querySelector('nav');
-    if (!sidebar) {
-      const navCandidates = document.querySelectorAll('nav');
-      for (const nav of navCandidates) {
-        if (nav.textContent.includes('New chat') || nav.querySelector('[draggable="true"]')) {
-          sidebar = nav;
-          break;
-        }
+  const SIDEBAR_SELECTORS = [
+    'nav',
+    'aside',
+    '[data-testid="sidebar"]',
+    '#sidebar',
+    '.sidebar',
+    '[class*="sidebar"]',
+    '[class*="w-\\["]'
+  ];
+
+  function findSidebar() {
+    const allNavs = document.querySelectorAll('nav, aside');
+    for (const el of allNavs) {
+      const text = el.textContent || '';
+      const hasNewChat = text.includes('New chat') || text.includes('New');
+      const hasHistory = el.querySelector('[draggable="true"]') || el.querySelector('a[href*="/c/"]');
+      const hasWidth = el.className.includes('w-') || el.className.includes('width');
+      if ((hasNewChat || hasHistory) && hasWidth) {
+        return el;
       }
     }
 
-    if (!sidebar) return;
+    for (const selector of SIDEBAR_SELECTORS) {
+      try {
+        const el = document.querySelector(selector);
+        if (el && (el.textContent?.includes('New chat') || el.querySelector('[draggable="true"]'))) {
+          return el;
+        }
+      } catch (e) {}
+    }
+
+    const allDivs = document.querySelectorAll('div');
+    for (const div of allDivs) {
+      const style = div.getAttribute('style') || '';
+      if (style.includes('260px') || style.includes('280px') || style.includes('width: 260')) {
+        return div;
+      }
+    }
+
+    return null;
+  }
+
+  function applyBlur() {
+    const sidebar = findSidebar();
+    if (!sidebar) {
+      return;
+    }
 
     sidebar.classList.add('shy-blur');
     sidebar.dataset.shyActive = 'true';
     sidebar.style.setProperty('--shy-blur-intensity', settings.intensity + 'px');
-    sidebar.dataset.shyHoverReveal = settings.hoverReveal;
   }
 
   function removeBlur() {
@@ -42,13 +75,23 @@
     chrome.storage.sync.get(['shySettings'], (result) => {
       settings = result.shySettings || defaults;
       if (settings.enabled) {
-        const checkSidebar = setInterval(() => {
-          if (document.querySelector('nav') || document.querySelector('[draggable="true"]')) {
+        const tryApply = () => {
+          if (findSidebar()) {
             applyBlur();
-            clearInterval(checkSidebar);
+            return true;
           }
-        }, 500);
-        setTimeout(() => clearInterval(checkSidebar), 10000);
+          return false;
+        };
+
+        if (!tryApply()) {
+          let attempts = 0;
+          const interval = setInterval(() => {
+            attempts++;
+            if (tryApply() || attempts > 20) {
+              clearInterval(interval);
+            }
+          }, 500);
+        }
       }
     });
   }
