@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="shy logo" width="128">
+  <img src="logo.png" alt="shy logo" width="500">
 </p>
 
 <h1 align="center">shy</h1>
