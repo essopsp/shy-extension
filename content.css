@@ -1,0 +1,15 @@
+.shy-blur {
+  filter: blur(var(--shy-blur-intensity, 8px));
+  transition: filter 0.2s ease;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.shy-blur:hover {
+  filter: blur(0);
+}
+
+.shy-blur * {
+  user-select: none;
+  pointer-events: auto;
+}
