@@ -2,14 +2,15 @@
   "manifest_version": 3,
   "name": "shy",
   "version": "1.0.0",
-  "description": "Blur the side menu content in ChatGPT for privacy",
+  "description": "Blur the side menu content in ChatGPT & Gemini for privacy",
   "permissions": [
     "storage",
     "activeTab"
   ],
   "host_permissions": [
     "https://chat.openai.com/*",
-    "https://chatgpt.com/*"
+    "https://chatgpt.com/*",
+    "https://gemini.google.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -33,7 +34,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*"],
+      "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*", "https://gemini.google.com/*"],
       "css": ["content.css"],
       "js": ["content.js"]
     }

@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     chrome.storage.sync.set({ shySettings: settings });
     updateStatus(settings.enabled);
-    chrome.tabs.query({ url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] }, (tabs) => {
+    chrome.tabs.query({ url: ['*://chat.openai.com/*', '*://chatgpt.com/*', '*://gemini.google.com/*'] }, (tabs) => {
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, { action: 'updateSettings', settings });
       });
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateStatus(enabled) {
-    status.textContent = enabled ? 'Active on ChatGPT' : 'Disabled';
+    status.textContent = enabled ? 'Active on ChatGPT & Gemini' : 'Disabled';
     status.className = enabled ? 'status active' : 'status';
   }
 

@@ -6,14 +6,14 @@
   function findSidebar() {
     const candidates = document.querySelectorAll('nav, aside, [role="navigation"]');
     for (const el of candidates) {
-      if (el.querySelector('a[href*="/c/"]') || el.querySelector('[draggable="true"]')) {
+      if (el.querySelector('a[href*="/c/"]') || el.querySelector('a[href*="/app/"]') || el.querySelector('[draggable="true"]')) {
         return el;
       }
     }
 
-    const convLinks = document.querySelectorAll('a[href*="/c/"]');
-    if (convLinks.length > 0) {
-      let parent = convLinks[0];
+    const chatLinks = document.querySelectorAll('a[href*="/c/"], a[href*="/app/"]');
+    if (chatLinks.length > 0) {
+      let parent = chatLinks[0];
       for (let i = 0; i < 5; i++) {
         if (parent?.parentElement) parent = parent.parentElement;
       }
@@ -27,6 +27,9 @@
         return nav;
       }
     }
+
+    const sideNav = document.querySelector('side-navigation-content');
+    if (sideNav) return sideNav;
 
     const allDivs = document.querySelectorAll('div');
     for (const div of allDivs) {
